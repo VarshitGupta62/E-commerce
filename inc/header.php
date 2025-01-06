@@ -261,7 +261,7 @@ if ($result) {
                         <a href="login.php" class="my-auto">
                             <i class="fas fa-user fa-2x"></i>
                         </a>
-                        <?php endif; ?>
+                        <?php endif; ?>  
 
                         <ul class="dropdown-menu dropdown-menu-right" style="top: 70px;" id="hidedropdown">
                             <?php if (isset($_SESSION['user_id'])): ?>
