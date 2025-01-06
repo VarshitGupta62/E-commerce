@@ -153,7 +153,36 @@ if (isset($_POST['resend_otp'])) {
     }
 }
 
+if (isset($_POST['userloginEmail'])) {
 
+    // echo("server is active");
+    $email = $_POST['userloginEmail'] ?? '';
+    $password = $_POST['userloginPassword'] ?? '';
 
+    // Validate inputs
+    if (empty($email) || empty($password)) {
+        echo json_encode(['status' => 0, 'message' => 'Email and password are required.']);
+        exit;
+    }
 
-?>
+    // Hash the password using MD5
+    $hashedPassword = md5($password);
+
+    // Query to check user
+    $stmt = $conn->prepare("SELECT * FROM customer WHERE cust_email = ? AND cust_password = ?");
+    $stmt->bind_param("ss", $email, $hashedPassword);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+
+        $_SESSION['user_id'] = $user['id'];
+        // echo $_SESSION['user_id'];
+        // $_SESSION['user_email'] = $user['userloginEmail'];
+
+        echo json_encode(['status' => 1, 'message' => 'Login successful.']);
+    } else {
+        echo json_encode(['status' => 0, 'message' => 'Invalid email or password.']);
+    }
+} 

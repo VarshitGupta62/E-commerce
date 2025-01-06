@@ -8,6 +8,20 @@ if ($row = mysqli_fetch_assoc($result)) {
     $favicon = $row['favicon'];
     $contact_email = $row['contact_email'];
 }
+session_start();
+
+$user_id = $_SESSION['user_id'];
+
+$query = "SELECT * FROM `customer` WHERE id = $user_id";
+
+$result = mysqli_query($conn, $query);
+
+if ($result) {
+    $customer_data = mysqli_fetch_assoc($result);
+} else {
+    die("Error fetching customer data: " . mysqli_error($conn));
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -239,38 +253,51 @@ if ($row = mysqli_fetch_assoc($result)) {
                                 class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
                                 style="top: -5px; left: 15px; height: 20px; min-width: 20px">0</span>
                         </a>
+                        <?php if (isset($_SESSION['user_id'])): ?>
                         <button style="background-color: transparent;border:none" onclick="toggleDropdown()">
-                                <i class="fas fa-user fa-2x"></i>
-                            <!-- <a href="login.php" class="my-auto">
-                                <i class="fas fa-user fa-2x"></i>
-                            </a> -->
+                            <i class="fas fa-tachometer-alt fa-2x"></i>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-right" style="top: 70px;" id="hidedropdown">
-                            <li class="dropdown-header" style="border-bottom: 1px solid #e5e9f2;">
-                                <!-- User image -->
-                                <img src="https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg" class="img-circle" alt="User Image" width="60" height="60">
-                                <div class="d-inline-block" style="font-size: 16px;font-weight: 800;color: #000">
-                                    Abdus Salam <small class="pt-1" style="font-size: 0.81rem;display: block;color: #8a909d;">iamabdus@gmail.com</small>
-                                </div>
-                            </li>
+                        <?php else: ?>
+                        <a href="login.php" class="my-auto">
+                            <i class="fas fa-user fa-2x"></i>
+                        </a>
+                        <?php endif; ?>
 
-                            <li>
-                                <a href="./dashboard.php" style="display: block;color: #8a909d;font-size: 0.88rem;padding: 0.625rem 1.25rem;">
-                                    <i  class="fa-solid fa-user" style="width: 18px;display: inline-block;text-align: center;margin-right: 0.625rem;"></i> My Profile
-                                </a>
-                            </li>
-                            <li>
-                                <a href="./login.php" style="display: block;color: #8a909d;font-size: 0.88rem;padding: 0.625rem 1.25rem;">
-                                <i class="fa-solid fa-user-plus" style="width: 18px;display: inline-block;text-align: center;margin-right: 0.625rem;"></i> Login
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" style="display: block;color: #8a909d;font-size: 0.88rem;padding: 0.625rem 1.25rem;"> <i  class="fa-solid fa-user-check" style="width: 18px;display: inline-block;text-align: center;margin-right: 0.625rem;"></i> Sign up </a>
-                            </li>
-                            <li class="dropdown-footer">
-                                <a href="./logout.php" style="display: block;color: #8a909d;font-size: 0.88rem;padding: 0.625rem 1.25rem;"> <i  class="fa-solid fa-right-from-bracket" style="width: 18px;display: inline-block;text-align: center;margin-right: 0.625rem;"></i> Log Out </a>
-                            </li>
+                        <ul class="dropdown-menu dropdown-menu-right" style="top: 70px;" id="hidedropdown">
+                            <?php if (isset($_SESSION['user_id'])): ?>
+                                <!-- Show Profile Section if Logged In -->
+                                <li class="dropdown-header" style="border-bottom: 1px solid #e5e9f2;">
+                                    <!-- User image -->
+                                    <img src="https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg" class="img-circle" alt="User Image" width="60" height="60">
+                                    <div class="d-inline-block" style="font-size: 16px;font-weight: 800;color: #000">
+                                        <?php echo htmlspecialchars($customer_data['cust_name']); ?>
+                                        <small class="pt-1" style="font-size: 0.81rem;display: block;color: #8a909d;">
+                                        <?php echo htmlspecialchars($customer_data['cust_email']); ?>
+                                        </small>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <a href="./dashboard.php" style="display: block;color: #8a909d;font-size: 0.88rem;padding: 0.625rem 1.25rem;">
+                                        <i class="fa-solid fa-user" style="width: 18px;display: inline-block;text-align: center;margin-right: 0.625rem;"></i> My Profile
+                                    </a>
+                                </li>
+                                <li class="dropdown-footer">
+                                    <a href="./logout.php" style="display: block;color: #8a909d;font-size: 0.88rem;padding: 0.625rem 1.25rem;">
+                                        <i class="fa-solid fa-right-from-bracket" style="width: 18px;display: inline-block;text-align: center;margin-right: 0.625rem;"></i> Log Out
+                                    </a>
+                                </li>
+
+                            <?php else: ?>
+                                <!-- Show Login Section if Not Logged In -->
+                                <li>
+                                    <a href="./login.php" style="display: block;color: #8a909d;font-size: 0.88rem;padding: 0.625rem 1.25rem;">
+                                        <i class="fa-solid fa-user-plus" style="width: 18px;display: inline-block;text-align: center;margin-right: 0.625rem;"></i> Login
+                                    </a>
+                                </li>
+                            <?php endif; ?>
                         </ul>
+
                         <!-- <div class="custom-dropdown-wrapper">
                           <div class="custom-dropdown">
                               <i class="fas fa-user fa-2x custom-dropdown-icon" id="uniqueUserIcon"></i>

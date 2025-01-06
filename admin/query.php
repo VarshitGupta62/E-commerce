@@ -1599,3 +1599,15 @@ if (isset($_POST['subcategory_id'])) {
         echo '<p>No products found.</p>';
     }
 } 
+
+// if login then show dashborad
+
+if (isset($_POST['dashboardName'])) {
+
+    echo("Server is active"); 
+
+}
+
+ 
+
+
