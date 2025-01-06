@@ -104,27 +104,31 @@ include("inc/header.php");
   }
 </style>
 
-<div class="contler-log" >
+<div class="contler-log">
   <div class="gaurav-log">
     <div class="form-box">
       <div class="form login-form">
         <h2>Login</h2>
-        <form>
+        <form id="userlogin">
           <div class="input-box">
-            <input type="text" required>
+            <input name="userloginEmail" type="email" required>
             <label>Email ID / Mobile No</label>
           </div>
           <div class="input-box">
-            <input type="password" required>
+            <input name="userloginPassword" type="password" required>
             <label>Password</label>
           </div>
           <button type="submit" class="btn">Log In</button>
+          <?php
+          // session_start();
+          // var_dump($_SESSION['user_id']);
+          ?>
           <p class="switch">New to our website? <a href="#" id="registerLink">Register Here</a></p>
         </form>
       </div>
-      <div class="form register-form hidden">
+      <div style="margin-top: 100px;" class="form register-form hidden"  >
         <h2>Register</h2>
-        <form id="loginForm">
+        <form  id="loginForm">
           <div class="input-box">
             <input type="text" name="login_name" required>
             <label>Full Name</label>
@@ -228,8 +232,6 @@ include("inc/header.php");
 </script>
 
 <script>
-  
-
   $('#loginForm').on('submit', function(e) {
     e.preventDefault();
 
@@ -244,54 +246,88 @@ include("inc/header.php");
     let mobileNumber = $('#mobileInput').val().trim();
 
     $('#loginForm input').each(function() {
-        if ($(this).val().trim() === '') {
-            isValid = false;
-            Swal.fire("Please fill all the fields", "", "warning");
-            submitButton.prop('disabled', false); // Re-enable the button on validation failure
-            return false; // Exit the loop on the first empty field
-        }
+      if ($(this).val().trim() === '') {
+        isValid = false;
+        Swal.fire("Please fill all the fields", "", "warning");
+        submitButton.prop('disabled', false); // Re-enable the button on validation failure
+        return false; // Exit the loop on the first empty field
+      }
     });
 
     // Validate Mobile Number
     if (isValid && !/^\d{10}$/.test(mobileNumber)) { // Check if the number is exactly 10 digits
-        isValid = false;
-        Swal.fire("Invalid Mobile Number", "Please enter a valid 10-digit mobile number.", "warning");
-        submitButton.prop('disabled', false); // Re-enable the button on validation failure
-        return;
+      isValid = false;
+      Swal.fire("Invalid Mobile Number", "Please enter a valid 10-digit mobile number.", "warning");
+      submitButton.prop('disabled', false); // Re-enable the button on validation failure
+      return;
     }
 
     if (!isValid) return; // Exit if validation fails
 
     $.ajax({
-        url: 'admin/userlogin.php',
-        type: 'POST',
-        data: formData,
-        contentType: false,
-        processData: false,
-        success: function(response) {
-            // alert(response);
-            let res = JSON.parse(response);
+      url: 'admin/userlogin.php',
+      type: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function(response) {
+        // alert(response);
+        let res = JSON.parse(response);
 
-            if (res.status === 1) {
-                Swal.fire("Success", "Please enter the OTP sent to your email.", "success");
+        if (res.status === 1) {
+          Swal.fire("Success", "Please enter the OTP sent to your email.", "success");
 
-                // Hide the login form and show the OTP form
-                $('.register-form').addClass('hidden');
-                $('.otp-form').removeClass('hidden');
-                timerDuration = 300; // Reset to 5 minutes
-                startTimer();
+          // Hide the login form and show the OTP form
+          $('.register-form').addClass('hidden');
+          $('.otp-form').removeClass('hidden');
+          timerDuration = 300; // Reset to 5 minutes
+          startTimer();
 
-            } else {
-                Swal.fire("Error", res.message, "error");
-                submitButton.prop('disabled', false); // Re-enable the button on error
-            }
-        },
-        error: function() {
-            Swal.fire("Something went wrong.", "", "error");
-            submitButton.prop('disabled', false); // Re-enable the button on error
+        } else {
+          Swal.fire("Error", res.message, "error");
+          submitButton.prop('disabled', false); // Re-enable the button on error
         }
+      },
+      error: function() {
+        Swal.fire("Something went wrong.", "", "error");
+        submitButton.prop('disabled', false); // Re-enable the button on error
+      }
     });
-});
+  });
+
+
+  $('#userlogin').on('submit', function(e) {
+    e.preventDefault();
+
+    let formData = new FormData(this);
+
+    $.ajax({
+      url: 'admin/userlogin.php',
+      type: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function(response) {
+        // alert(response);
+        try {
+          let res = JSON.parse(response);
+          if (res.status === 1) {
+            Swal.fire("Success", res.message, "success").then(() => {
+              window.location.href = "dashboard.php";
+            });
+          } else {
+            Swal.fire("Error", res.message, "error");
+          }
+        } catch (error) {
+          Swal.fire("Error", "Invalid server response.", "error");
+        }
+      },
+      error: function() {
+        Swal.fire("Something went wrong.", "", "error");
+      }
+    });
+  });
+
 
 
   $('#otpForm').on('submit', function(e) {
@@ -404,9 +440,6 @@ include("inc/header.php");
       }
     }, 1000); // Update every 1000ms (1 second)
   }
-
-
- 
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
